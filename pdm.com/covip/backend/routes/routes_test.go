@@ -38,16 +38,6 @@ func (r *MockResponseWriter) Assert(status int, body string) {
 	}
 }
 
-/*
-func (r *mux.Route) AssertGetSumRoute(sumpath string, summethod string) {
-   if path, _ := r.GetPathTemplate(); path != sumpath {
-	r.t.Errorf("expected path %+v to equal %+v", string(path), sumpath)
-   }
-   if method, _ := r.GetMethods(); method != summethod {
-	r.t.Errorf("expected path %+v to equal %+v", string(method), summethod)
-   }
-}
-*/
 func TestGetSummaryEndpoint(t *testing.T) {
 	oldGetSumFunc := getSumFunc
 	getSumFunc = func() []services.CovidData {
@@ -61,33 +51,21 @@ func TestGetSummaryEndpoint(t *testing.T) {
 	getSumFunc = oldGetSumFunc
 }
 
+func TestGetCountryCasesEndpoint(t *testing.T){
+	oldGetCCases := getCCases
+	getCCases = func(name string) []services.CovidData {
+		return []services.CovidData{}
+	}
+	r, _ := http.NewRequest("GET","countryData/test", nil)
+	mw := &MockResponseWriter{t: t}
+	getCountryCasesEndpoint(mw, r)
+	mw.Assert(200, "[]")
+	getCCases = oldGetCCases
+}
+
 func TestRoutes(t *testing.T) {
 	router := Routes()
 	if router == nil {
 		t.Errorf("expected router to be not nil")
 	}
-	/*	err := router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-			pathTemplate, err := route.GetPathTemplate()
-			if err == nil {
-				fmt.Println("ROUTE:", pathTemplate)
-			}
-			methods, err := route.GetMethods()
-			if err == nil {
-				fmt.Println("Methods:", methods)
-			}
-
-			handlerfunc := route.GetHandler()
-			if handlerfunc != GetSummaryEndpoint {
-				t.Errorf("expected handler function %+v to equal %+v", handlerfunc, GetSummaryEndpoint)
-			}
-
-			return nil
-		})
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-	*/
-
 }
