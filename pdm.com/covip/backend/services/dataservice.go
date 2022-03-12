@@ -10,16 +10,30 @@ import (
 	"time"
 )
 
-func download(url string, filepath string) error {
+var (
+	appName         = "covis-golang"
+	downloadDirName = "datafiles"
+	downloadDirPath = filepath.Join(os.TempDir(), appName, downloadDirName)
+)
+
+func init() {
+	if _, errDir := os.Stat(downloadDirPath); os.IsNotExist(errDir) {
+		errMkdir := os.MkdirAll(downloadDirPath, 0777)
+		if errMkdir != nil {
+			fmt.Println("Err encountered:", errMkdir)
+		}
+	}
+}
+
+func download(url string, filePath string) error {
 
 	resp, err := http.Get(url)
-	//fmt.Println("Response from download", resp)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	out, err := os.Create(filepath)
+	out, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}
@@ -28,37 +42,31 @@ func download(url string, filepath string) error {
 	return err
 }
 
-func Readrawdata() string {
-	url := "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-31-2021.csv"
-	pathdir := "githubfiles"
-
-	errmkdir := os.MkdirAll(pathdir, 0777)
-	if errmkdir != nil {
-		fmt.Println("Err encountered:", errmkdir)
-	}
-
-	//path := "githubfiles/covid_data"
-	today := time.Now().Format("01-02-2006")
-	path_current := filepath.Join(pathdir, "covid_data_"+today+".csv")
-	//path_current := path + "_" + today + ".csv"
+func ReadRawData() string {
 	fmt.Println("In Readrawdata function")
-	//filehandler, err := os.Open(path_current)
 
-	err := download(url, path_current)
-	if err != nil {
-		fmt.Println("Was unable to download file due to:", err)
-		return ""
+	url := "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+	today := time.Now().Format("01-02-2006")
+	downloadUrl := url + today + ".csv"
+	downloadFileName := "covid_data_" + today + ".csv"
+	downloadFilePath := filepath.Join(downloadDirPath, downloadFileName)
+
+	if _, errFile := os.Stat(downloadFilePath); os.IsNotExist(errFile) {
+		err := download(downloadUrl, downloadFilePath)
+		if err != nil {
+			fmt.Println("Was unable to download file due to:", err)
+			return ""
+		}
 	}
 
-	filehandler, err := os.Open(path_current)
+	fileHandler, err := os.Open(downloadFilePath)
 	if err != nil {
 		fmt.Println("Error encountered in opening csv file:", err)
 	}
-	scanner := bufio.NewScanner(filehandler)
-	var filedata string
+	scanner := bufio.NewScanner(fileHandler)
+	var fileData string
 	for scanner.Scan() {
-		filedata += scanner.Text() + "\n"
+		fileData += scanner.Text() + "\n"
 	}
-	//fmt.Println("filedata from Readrawdata ready", filedata)
-	return filedata
+	return fileData
 }
