@@ -42,6 +42,7 @@ func download(url string, filePath string) error {
 	return err
 }
 
+//ReadRawData reads from downloaded file and returns covid statistics.
 func ReadRawData() string {
 	fmt.Println("In Readrawdata function")
 
