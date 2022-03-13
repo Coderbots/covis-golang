@@ -45,13 +45,13 @@ func jsonHandleError(response http.ResponseWriter, err error) {
 var getSumFunc = services.GetSummary
 
 func getSummaryEndpoint(response http.ResponseWriter, request *http.Request) {
-	codata, errSum := getSumFunc()
+	summaryData, errSum := getSumFunc()
 	if errSum != nil {
 		fmt.Println("Error on retrieving Summary:", errSum)
 		jsonHandleError(response, errSum)
 		return
 	}
-	jsonResponse, err := json.Marshal(codata)
+	jsonResponse, err := json.Marshal(summaryData)
 	if err != nil {
 		fmt.Println("Json response not obtained", err)
 		jsonHandleError(response, err)
@@ -65,13 +65,13 @@ var getCCases = services.GetCountryCases
 func getCountryCasesEndpoint(response http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	name := params["name"]
-	countrycount, errCCases := getCCases(name)
+	countryCount, errCCases := getCCases(name)
 	if errCCases != nil {
 		fmt.Println("Error on retrieving Country Cases:", errCCases)
 		jsonHandleError(response, errCCases)
 		return
 	}
-	jsonResponse, err := json.Marshal(countrycount)
+	jsonResponse, err := json.Marshal(countryCount)
 	if err != nil {
 		fmt.Println("Json response not obtained", err)
 		jsonHandleError(response, err)
