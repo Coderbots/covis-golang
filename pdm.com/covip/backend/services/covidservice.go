@@ -22,7 +22,6 @@ func processData(text string) []CovidData {
 	fmt.Println("In processData function")
 	reader := csv.NewReader(strings.NewReader(text))
 	record, err := reader.Read()
-	//fmt.Println("First line", record)
 	if err != nil {
 		fmt.Println("Error encountered reading first line of csv:", err)
 		return []CovidData{}
@@ -30,7 +29,6 @@ func processData(text string) []CovidData {
 	var data []CovidData
 	for {
 		record, err = reader.Read()
-		//fmt.Println("Line:",record[6])
 		if err == io.EOF {
 			fmt.Println("EOF!")
 			break
@@ -38,10 +36,8 @@ func processData(text string) []CovidData {
 		if err == nil {
 			confirmed_int, err := strconv.ParseFloat(record[6], 64)
 			if err != nil {
-				//fmt.Println("Error in string conversion", err)
 				confirmed_int = 0
 			}
-			//			fmt.Println("Confirmed count",confirmed_int)
 			data = append(data, CovidData{
 				Confirmed:      confirmed_int,
 				Province_state: record[2],
@@ -52,13 +48,12 @@ func processData(text string) []CovidData {
 			return data
 		}
 	}
-	//	fmt.Println("In ProcessData function data is:",data)
 	return data
 }
 
 func createSummary() []CovidData {
 	fmt.Println("In createSummary function")
-	text := Readrawdata()
+	text := ReadRawData()
 	processedData := processData(text)
 	if processedData == nil {
 		fmt.Println("Processed Data is empty")
@@ -87,7 +82,6 @@ func createSummary() []CovidData {
 	sort.Slice(sortedarr, func(i, j int) bool {
 		return sortedarr[i].Confirmed > sortedarr[j].Confirmed
 	})
-	//fmt.Println("Coviddata in data struct form:", sortedarr)
 	return sortedarr
 }
 
@@ -99,7 +93,7 @@ func GetSummary() []CovidData {
 
 func GetCountryCases(name string) []CovidData {
 	fmt.Println("In GetCountryCases function")
-	text := Readrawdata()
+	text := ReadRawData()
 	processedData := processData(text)
 	if processedData == nil {
 		fmt.Println("Processed Data is empty")
