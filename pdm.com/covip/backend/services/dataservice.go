@@ -34,7 +34,14 @@ func download(url string, filePath string) error {
 		return err
 	}
 	defer resp.Body.Close()
-
+	if resp.StatusCode != 200 {
+		b, errHttpResponse := io.ReadAll(resp.Body)
+		if errHttpResponse == nil {
+			err = errors.New(string(b))
+			return err
+		}
+		return errHttpResponse
+	}
 	out, err := os.Create(filePath)
 	if err != nil {
 		return err
