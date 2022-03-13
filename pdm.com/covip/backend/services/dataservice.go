@@ -86,6 +86,7 @@ func ReadRawData() string {
 	fileHandler, err := os.Open(downloadFilePath)
 	if err != nil {
 		fmt.Println("Error encountered in opening csv file:", err)
+		return ""
 	}
 
 	scanner := bufio.NewScanner(fileHandler)
