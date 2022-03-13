@@ -3,8 +3,8 @@ package services
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -22,7 +22,7 @@ func init() {
 	if _, errDir := os.Stat(downloadDirPath); os.IsNotExist(errDir) {
 		errMkdir := os.MkdirAll(downloadDirPath, 0777)
 		if errMkdir != nil {
-			fmt.Println("Err encountered:", errMkdir)
+			log.Println("Err encountered:", errMkdir)
 		}
 	}
 }
@@ -56,7 +56,7 @@ func download(url string, filePath string) error {
 
 //ReadRawData reads from downloaded file and returns covid statistics.
 func ReadRawData() string {
-	fmt.Println("In Readrawdata function")
+	log.Println("In Readrawdata function")
 
 	url := helpers.AppConfig.CovidRepo.Url
 
@@ -74,7 +74,7 @@ func ReadRawData() string {
 		downloadFilePath = filepath.Join(downloadDirPath, downloadFileName)
 
 		if _, errFile := os.Stat(downloadFilePath); os.IsNotExist(errFile) {
-			fmt.Printf("File not present!Attempting to download %d time ...\n", i+1)
+			log.Printf("File not present!Attempting to download %d time ...\n", i+1)
 			errDownload = download(downloadUrl, downloadFilePath)
 			if errDownload == nil {
 				fileDownloaded = true
@@ -88,13 +88,13 @@ func ReadRawData() string {
 	}
 
 	if !fileDownloaded {
-		fmt.Println("Was unable to download file due to:", errDownload)
+		log.Println("Was unable to download file due to:", errDownload)
 		return ""
 	}
 
 	fileHandler, err := os.Open(downloadFilePath)
 	if err != nil {
-		fmt.Println("Error encountered in opening csv file:", err)
+		log.Println("Error encountered in opening csv file:", err)
 		return ""
 	}
 

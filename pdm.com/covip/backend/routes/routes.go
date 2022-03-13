@@ -3,8 +3,8 @@ package routes
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"pdm.com/covip/backend/model"
 	"pdm.com/covip/backend/services"
@@ -47,13 +47,13 @@ var getSumFunc = services.GetSummary
 func getSummaryEndpoint(response http.ResponseWriter, request *http.Request) {
 	summaryData, errSum := getSumFunc()
 	if errSum != nil {
-		fmt.Println("Error on retrieving Summary:", errSum)
+		log.Println("Error on retrieving Summary:", errSum)
 		jsonHandleError(response, errSum)
 		return
 	}
 	jsonResponse, err := json.Marshal(summaryData)
 	if err != nil {
-		fmt.Println("Json response not obtained", err)
+		log.Println("Json response not obtained", err)
 		jsonHandleError(response, err)
 		return
 	}
@@ -67,13 +67,13 @@ func getCountryCasesEndpoint(response http.ResponseWriter, request *http.Request
 	name := params["name"]
 	countryCount, errCCases := getCCases(name)
 	if errCCases != nil {
-		fmt.Println("Error on retrieving Country Cases:", errCCases)
+		log.Println("Error on retrieving Country Cases:", errCCases)
 		jsonHandleError(response, errCCases)
 		return
 	}
 	jsonResponse, err := json.Marshal(countryCount)
 	if err != nil {
-		fmt.Println("Json response not obtained", err)
+		log.Println("Json response not obtained", err)
 		jsonHandleError(response, err)
 		return
 	}

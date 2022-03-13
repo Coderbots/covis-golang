@@ -2,12 +2,12 @@ package services
 
 import (
 	"encoding/csv"
-	"fmt"
 	"io"
 	"strconv"
 	"strings"
 	//	"encoding/json"
 	"errors"
+	"log"
 	"pdm.com/covip/backend/model"
 	"sort"
 )
@@ -21,12 +21,12 @@ type CovidData struct {
 }
 
 func processData(text string) []CovidData {
-	fmt.Println("In processData function")
+	log.Println("In processData function")
 
 	reader := csv.NewReader(strings.NewReader(text))
 	record, err := reader.Read()
 	if err != nil {
-		fmt.Println("Error encountered reading first line of csv:", err)
+		log.Println("Error encountered reading first line of csv:", err)
 		return []CovidData{}
 	}
 
@@ -34,7 +34,7 @@ func processData(text string) []CovidData {
 	for {
 		record, err = reader.Read()
 		if err == io.EOF {
-			fmt.Println("EOF!")
+			log.Println("EOF!")
 			break
 		}
 		if err == nil {
@@ -48,7 +48,7 @@ func processData(text string) []CovidData {
 				CountryRegion: record[3],
 			})
 		} else {
-			fmt.Println("Error encountered in reading csv:", err)
+			log.Println("Error encountered in reading csv:", err)
 			return data
 		}
 	}
@@ -56,7 +56,7 @@ func processData(text string) []CovidData {
 }
 
 func readProcessData() ([]CovidData, error) {
-	fmt.Println("In readProcessData function")
+	log.Println("In readProcessData function")
 
 	text := ReadRawData()
 	if text == "" {
@@ -65,14 +65,14 @@ func readProcessData() ([]CovidData, error) {
 
 	processedData := processData(text)
 	if processedData == nil {
-		fmt.Println("Processed Data is empty")
+		log.Println("Processed Data is empty")
 		return []CovidData{}, errors.New("Internal error encountered")
 	}
 	return processedData, nil
 }
 
 func createSummary() ([]CovidData, error) {
-	fmt.Println("In createSummary function")
+	log.Println("In createSummary function")
 
 	processedData, errProcessData := readProcessData()
 	if errProcessData != nil {
@@ -107,13 +107,13 @@ func createSummary() ([]CovidData, error) {
 }
 
 func GetSummary() ([]CovidData, error) {
-	fmt.Println("In GetSummary function")
+	log.Println("In GetSummary function")
 	summary, err := createSummary()
 	return summary, err
 }
 
 func GetCountryCases(name string) ([]CovidData, error) {
-	fmt.Println("In GetCountryCases function")
+	log.Println("In GetCountryCases function")
 
 	processedData, errProcessData := readProcessData()
 	if errProcessData != nil {
