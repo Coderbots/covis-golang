@@ -2,11 +2,13 @@ package services
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"pdm.com/covip/backend/helpers"
 	"time"
 )
 
@@ -46,7 +48,7 @@ func download(url string, filePath string) error {
 func ReadRawData() string {
 	fmt.Println("In Readrawdata function")
 
-	url := "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
+	url := helpers.AppConfig.CovidRepo.Url
 	today := time.Now().Format("01-02-2006")
 	downloadUrl := url + today + ".csv"
 	downloadFileName := "covid_data_" + today + ".csv"
