@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	//	"encoding/json"
+	"errors"
+	"pdm.com/covip/backend/model"
 	"sort"
 )
 
@@ -51,13 +53,16 @@ func processData(text string) []CovidData {
 	return data
 }
 
-func createSummary() []CovidData {
+func createSummary() ([]CovidData, error) {
 	fmt.Println("In createSummary function")
 	text := ReadRawData()
+	if text == "" {
+		return []CovidData{}, model.WrapError(errors.New("No data available for this day"), model.ErrNotFound)
+	}
 	processedData := processData(text)
 	if processedData == nil {
 		fmt.Println("Processed Data is empty")
-		return []CovidData{}
+		return []CovidData{}, errors.New("Internal error encountered")
 	}
 	var sortedarr []CovidData
 	found := 0
@@ -82,22 +87,25 @@ func createSummary() []CovidData {
 	sort.Slice(sortedarr, func(i, j int) bool {
 		return sortedarr[i].Confirmed > sortedarr[j].Confirmed
 	})
-	return sortedarr
+	return sortedarr, nil
 }
 
-func GetSummary() []CovidData {
+func GetSummary() ([]CovidData, error) {
 	fmt.Println("In GetSummary function")
-	summary := createSummary()
-	return summary
+	summary, err := createSummary()
+	return summary, err
 }
 
-func GetCountryCases(name string) []CovidData {
+func GetCountryCases(name string) ([]CovidData, error) {
 	fmt.Println("In GetCountryCases function")
 	text := ReadRawData()
+	if text == "" {
+		return []CovidData{}, model.WrapError(errors.New("No data available for this day"), model.ErrNotFound)
+	}
 	processedData := processData(text)
 	if processedData == nil {
 		fmt.Println("Processed Data is empty")
-		return []CovidData{}
+		return []CovidData{}, errors.New("Internal error encountered")
 	}
 	var countrycase []CovidData
 	for i := 0; i < len(processedData); i++ {
@@ -109,5 +117,5 @@ func GetCountryCases(name string) []CovidData {
 			})
 		}
 	}
-	return countrycase
+	return countrycase, nil
 }
