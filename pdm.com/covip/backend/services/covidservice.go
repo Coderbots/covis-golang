@@ -55,8 +55,8 @@ func processData(text string) []CovidData {
 	return data
 }
 
-func createSummary() ([]CovidData, error) {
-	fmt.Println("In createSummary function")
+func readProcessData() ([]CovidData, error) {
+	fmt.Println("In readProcessData function")
 
 	text := ReadRawData()
 	if text == "" {
@@ -67,6 +67,16 @@ func createSummary() ([]CovidData, error) {
 	if processedData == nil {
 		fmt.Println("Processed Data is empty")
 		return []CovidData{}, errors.New("Internal error encountered")
+	}
+	return processedData, nil
+}
+
+func createSummary() ([]CovidData, error) {
+	fmt.Println("In createSummary function")
+
+	processedData, errProcessData := readProcessData()
+	if errProcessData != nil {
+		return processedData, errProcessData
 	}
 
 	var sortedArr []CovidData
@@ -105,15 +115,9 @@ func GetSummary() ([]CovidData, error) {
 func GetCountryCases(name string) ([]CovidData, error) {
 	fmt.Println("In GetCountryCases function")
 
-	text := ReadRawData()
-	if text == "" {
-		return []CovidData{}, model.WrapError(errors.New("No data available for this day"), model.ErrNotFound)
-	}
-
-	processedData := processData(text)
-	if processedData == nil {
-		fmt.Println("Processed Data is empty")
-		return []CovidData{}, errors.New("Internal error encountered")
+	processedData, errProcessData := readProcessData()
+	if errProcessData != nil {
+		return processedData, errProcessData
 	}
 
 	var countryCase []CovidData
