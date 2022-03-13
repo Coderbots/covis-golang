@@ -59,7 +59,12 @@ func ReadRawData() string {
 	fmt.Println("In Readrawdata function")
 
 	url := helpers.AppConfig.CovidRepo.Url
-	var downloadFilePath string
+
+	var (
+		downloadFilePath string
+		errDownload      error
+		fileDownloaded   = false
+	)
 
 	//Check if data is available for last 4 days. Return the last available data.
 	for i := 0; i <= 3; i++ {
@@ -70,17 +75,21 @@ func ReadRawData() string {
 
 		if _, errFile := os.Stat(downloadFilePath); os.IsNotExist(errFile) {
 			fmt.Printf("File not present!Attempting to download %d time ...\n", i+1)
-			errDownload := download(downloadUrl, downloadFilePath)
+			errDownload = download(downloadUrl, downloadFilePath)
 			if errDownload == nil {
+				fileDownloaded = true
 				break
-			} else if errDownload != nil && i == 3 {
-				fmt.Println("Was unable to download file due to:", errDownload)
-				return ""
 			}
 		} else {
+			fileDownloaded = true
 			break
 		}
 
+	}
+
+	if !fileDownloaded {
+		fmt.Println("Was unable to download file due to:", errDownload)
+		return ""
 	}
 
 	fileHandler, err := os.Open(downloadFilePath)
