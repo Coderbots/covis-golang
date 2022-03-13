@@ -34,6 +34,7 @@ func download(url string, filePath string) error {
 		return err
 	}
 	defer resp.Body.Close()
+
 	if resp.StatusCode != 200 {
 		b, errHttpResponse := io.ReadAll(resp.Body)
 		if errHttpResponse == nil {
@@ -42,12 +43,14 @@ func download(url string, filePath string) error {
 		}
 		return errHttpResponse
 	}
+
 	out, err := os.Create(filePath)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
 	_, err = io.Copy(out, resp.Body)
+
 	return err
 }
 
@@ -56,23 +59,35 @@ func ReadRawData() string {
 	fmt.Println("In Readrawdata function")
 
 	url := helpers.AppConfig.CovidRepo.Url
-	today := time.Now().Format("01-02-2006")
-	downloadUrl := url + today + ".csv"
-	downloadFileName := "covid_data_" + today + ".csv"
-	downloadFilePath := filepath.Join(downloadDirPath, downloadFileName)
+	var downloadFilePath string
 
-	if _, errFile := os.Stat(downloadFilePath); os.IsNotExist(errFile) {
-		err := download(downloadUrl, downloadFilePath)
-		if err != nil {
-			fmt.Println("Was unable to download file due to:", err)
-			return ""
+	//Check if data is available for last 4 days. Return the last available data.
+	for i := 0; i <= 3; i++ {
+		today := time.Now().AddDate(0, 0, -i).Format("01-02-2006")
+		downloadUrl := url + today + ".csv"
+		downloadFileName := "covid_data_" + today + ".csv"
+		downloadFilePath = filepath.Join(downloadDirPath, downloadFileName)
+
+		if _, errFile := os.Stat(downloadFilePath); os.IsNotExist(errFile) {
+			fmt.Printf("File not present!Attempting to download %d time ...\n", i+1)
+			errDownload := download(downloadUrl, downloadFilePath)
+			if errDownload == nil {
+				break
+			} else if errDownload != nil && i == 3 {
+				fmt.Println("Was unable to download file due to:", errDownload)
+				return ""
+			}
+		} else {
+			break
 		}
+
 	}
 
 	fileHandler, err := os.Open(downloadFilePath)
 	if err != nil {
 		fmt.Println("Error encountered in opening csv file:", err)
 	}
+
 	scanner := bufio.NewScanner(fileHandler)
 	var fileData string
 	for scanner.Scan() {
