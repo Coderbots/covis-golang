@@ -11,10 +11,10 @@ import (
 )
 
 func main() {
-	// Read Config file
+	// Read Config file.
 	helpers.ReadConfig()
 
-	// Set up application arguments
+	// Set up application arguments.
 	addr := flag.String("addr", ":8080", "HTTPS network address")
 	certFile := flag.String("certfile", "cert.pem", "certificate PEM file")
 	keyFile := flag.String("keyfile", "key.pem", "key PEM file")
@@ -31,7 +31,6 @@ func main() {
 	}
 
 	log.Printf("Starting server on port %s..", *addr)
-	//log.Fatal(http.ListenAndServe(":8080", r))
 	err := srv.ListenAndServeTLS(*certFile, *keyFile)
 	log.Fatal(err)
 }

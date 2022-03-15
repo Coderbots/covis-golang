@@ -12,18 +12,19 @@ import (
 	"sort"
 )
 
-const path = "githubfiles/covid_data"
-
 type CovidData struct {
 	Confirmed     float64 `json:"confirmed"`
 	ProvinceState string  `json:"province_state,omitempty"`
 	CountryRegion string  `json:"country_region"`
 }
 
+
+// processData reads from text and returns data of CovidData format.
 func processData(text string) []CovidData {
 	log.Println("In processData function")
-
+	// Return CSV reader that reads from text.
 	reader := csv.NewReader(strings.NewReader(text))
+	// Skip first row with headers.
 	record, err := reader.Read()
 	if err != nil {
 		log.Println("Error encountered reading first line of csv:", err)
@@ -55,6 +56,7 @@ func processData(text string) []CovidData {
 	return data
 }
 
+// readProcessData calls ReadRawData function and returns processed data.
 func readProcessData() ([]CovidData, error) {
 	log.Println("In readProcessData function")
 
@@ -71,6 +73,7 @@ func readProcessData() ([]CovidData, error) {
 	return processedData, nil
 }
 
+// createSummary returns confirmed Covid case count per Country in descending manner.
 func createSummary() ([]CovidData, error) {
 	log.Println("In createSummary function")
 
@@ -106,12 +109,14 @@ func createSummary() ([]CovidData, error) {
 	return sortedArr, nil
 }
 
+// GetSummary calls createSummary function.
 func GetSummary() ([]CovidData, error) {
 	log.Println("In GetSummary function")
 	summary, err := createSummary()
 	return summary, err
 }
 
+// GetCountryCases returns confirmed Covid case count per province/state given country.
 func GetCountryCases(name string) ([]CovidData, error) {
 	log.Println("In GetCountryCases function")
 

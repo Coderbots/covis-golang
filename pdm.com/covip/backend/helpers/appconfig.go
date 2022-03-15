@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Path to app config file.
 const configPath = "helpers/config.yml"
 
 type CovidRepo struct {
@@ -18,6 +19,7 @@ type Config struct {
 
 var AppConfig *Config
 
+// ReadConfig reads from config and pass data to AppConfig.
 func ReadConfig() {
 	fileHandler, err := os.Open(configPath)
 	if err != nil {

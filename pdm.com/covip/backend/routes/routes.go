@@ -14,6 +14,7 @@ func verifyUserPass(username, password string) bool {
 	return true //FIX ME!Returning true for all users
 }
 
+// basicAuth verifies user credentials.
 func basicAuth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, pass, ok := r.BasicAuth()
@@ -32,6 +33,7 @@ func jsonError(response http.ResponseWriter, status int, msg string) {
 	http.Error(response, msg, status)
 }
 
+// jsonHandleError wraps error message into standardized error.
 func jsonHandleError(response http.ResponseWriter, err error) {
 	var apiErr model.APIError
 	if errors.As(err, &apiErr) {
@@ -42,8 +44,10 @@ func jsonHandleError(response http.ResponseWriter, err error) {
 	}
 }
 
+// Define getSumFunc to allow for mocking.
 var getSumFunc = services.GetSummary
 
+// getSummaryEndpoint passes the user call to internal function.
 func getSummaryEndpoint(response http.ResponseWriter, request *http.Request) {
 	summaryData, errSum := getSumFunc()
 	if errSum != nil {
@@ -80,6 +84,7 @@ func getCountryCasesEndpoint(response http.ResponseWriter, request *http.Request
 	response.Write(jsonResponse)
 }
 
+// Define API paths.
 func Routes() *mux.Router {
 
 	router := mux.NewRouter()

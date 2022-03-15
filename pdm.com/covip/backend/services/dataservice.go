@@ -31,7 +31,9 @@ var (
 )
 
 func init() {
+	// Initialize HTTP Client.
 	client = &http.Client{}
+	//Create download directory for data files.
 	if _, errDir := os.Stat(downloadDirPath); os.IsNotExist(errDir) {
 		errMkdir := os.MkdirAll(downloadDirPath, 0777)
 		if errMkdir != nil {
@@ -40,6 +42,7 @@ func init() {
 	}
 }
 
+// download calls public covid repo and returns data.
 func download(url string, filePath string) error {
 	resp, err := client.Get(url)
 	if err != nil {
@@ -112,6 +115,7 @@ func (service readUrlServiceImpl) ReadRawData() string {
 	scanner := bufio.NewScanner(fileHandler)
 	var fileData string
 	for scanner.Scan() {
+		// Add back new line removed by scanner.
 		fileData += scanner.Text() + "\n"
 	}
 	return fileData
