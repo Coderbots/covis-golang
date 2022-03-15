@@ -12,13 +12,26 @@ import (
 	"time"
 )
 
+type readUrlService interface {
+	ReadRawData() string
+}
+
+type readUrlServiceImpl struct{}
+
+type httpClient interface {
+	Get(url string) (*http.Response, error)
+}
+
 var (
-	appName         = "covis-golang"
-	downloadDirName = "datafiles"
-	downloadDirPath = filepath.Join(os.TempDir(), appName, downloadDirName)
+	appName                        = "covis-golang"
+	downloadDirName                = "datafiles"
+	downloadDirPath                = filepath.Join(os.TempDir(), appName, downloadDirName)
+	readUrlSvc      readUrlService = readUrlServiceImpl{}
+	client          httpClient
 )
 
 func init() {
+	client = &http.Client{}
 	if _, errDir := os.Stat(downloadDirPath); os.IsNotExist(errDir) {
 		errMkdir := os.MkdirAll(downloadDirPath, 0777)
 		if errMkdir != nil {
@@ -28,8 +41,7 @@ func init() {
 }
 
 func download(url string, filePath string) error {
-
-	resp, err := http.Get(url)
+	resp, err := client.Get(url)
 	if err != nil {
 		return err
 	}
@@ -55,7 +67,7 @@ func download(url string, filePath string) error {
 }
 
 //ReadRawData reads from downloaded file and returns covid statistics.
-func ReadRawData() string {
+func (service readUrlServiceImpl) ReadRawData() string {
 	log.Println("In Readrawdata function")
 
 	url := helpers.AppConfig.CovidRepo.Url
@@ -72,7 +84,6 @@ func ReadRawData() string {
 		downloadUrl := url + today + ".csv"
 		downloadFileName := "covid_data_" + today + ".csv"
 		downloadFilePath = filepath.Join(downloadDirPath, downloadFileName)
-
 		if _, errFile := os.Stat(downloadFilePath); os.IsNotExist(errFile) {
 			log.Printf("File not present!Attempting to download %d time ...\n", i+1)
 			errDownload = download(downloadUrl, downloadFilePath)

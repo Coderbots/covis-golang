@@ -8,10 +8,12 @@ import (
 
 const configPath = "helpers/config.yml"
 
+type CovidRepo struct {
+	Url string `yaml:"url"`
+}
+
 type Config struct {
-	CovidRepo struct {
-		Url string `yaml:"url"`
-	} `yaml:"covidRepo"`
+	CovidRepo CovidRepo `yaml:"covidRepo"`
 }
 
 var AppConfig *Config

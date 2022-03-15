@@ -39,26 +39,30 @@ func (r *MockResponseWriter) Assert(status int, body string) {
 }
 
 func TestGetSummaryEndpoint(t *testing.T) {
+	// Setting up mock function.
 	oldGetSumFunc := getSumFunc
-	getSumFunc = func() []services.CovidData {
-		return []services.CovidData{}
+	getSumFunc = func() ([]services.CovidData, error) {
+		return []services.CovidData{}, nil
 	}
 
 	mw := &MockResponseWriter{t: t}
 	getSummaryEndpoint(mw, nil)
-	//nullvar []byte := nil
+
+	// Check if successful call was made.
 	mw.Assert(200, "[]")
 	getSumFunc = oldGetSumFunc
 }
 
-func TestGetCountryCasesEndpoint(t *testing.T){
+func TestGetCountryCasesEndpoint(t *testing.T) {
 	oldGetCCases := getCCases
-	getCCases = func(name string) []services.CovidData {
-		return []services.CovidData{}
+	getCCases = func(name string) ([]services.CovidData, error) {
+		return []services.CovidData{}, nil
 	}
-	r, _ := http.NewRequest("GET","countryData/test", nil)
+
+	r, _ := http.NewRequest("GET", "countryData/test", nil)
 	mw := &MockResponseWriter{t: t}
 	getCountryCasesEndpoint(mw, r)
+
 	mw.Assert(200, "[]")
 	getCCases = oldGetCCases
 }

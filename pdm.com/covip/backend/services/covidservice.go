@@ -34,7 +34,7 @@ func processData(text string) []CovidData {
 	for {
 		record, err = reader.Read()
 		if err == io.EOF {
-			log.Println("EOF!")
+			log.Println("EOF reached while reading CSV data!")
 			break
 		}
 		if err == nil {
@@ -58,7 +58,7 @@ func processData(text string) []CovidData {
 func readProcessData() ([]CovidData, error) {
 	log.Println("In readProcessData function")
 
-	text := ReadRawData()
+	text := readUrlSvc.ReadRawData()
 	if text == "" {
 		return []CovidData{}, model.WrapError(errors.New("No data available for this day"), model.ErrNotFound)
 	}
